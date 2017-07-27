@@ -21,17 +21,23 @@ app.get('/getcurrencies', (req, res) => {
     )
 })
 
-//Returns rates for currency
-//@param inputCurrency
+//Returns rates for conversion
 app.get('/getrate', (req, res) => {
+    //@param inputCurrency
+    const input = req.q.inputCurrency
+    const output = req.query.outputCurrency
+
+    if(!input) res.send(null)
+    const url = output ? `http://api.fixer.io/latest?symbols=${input},${output}` : `http://api.fixer.io/latest?base=${input}`
     request.get(
-        `http://api.fixer.io/latest?base=${req.inputCurrency}`,
-        function(err, response, body) {
+        `http://api.fixer.io/latest?symbols=${input},${output}`,
+        function (err, response, body) {
             res.send(JSON.parse(body)["rates"])
         }
     )
 })
 
+app.get('/get')
 
 app.get('/handle', (req, res) => {
 
