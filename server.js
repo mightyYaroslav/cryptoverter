@@ -24,7 +24,7 @@ app.get('/getcurrencies', (req, res) => {
 //Returns rates for conversion
 app.get('/getrate', (req, res) => {
     //@param inputCurrency
-    const input = req.q.inputCurrency
+    const input = req.query.inputCurrency
     const output = req.query.outputCurrency
 
     if(!input) res.send(null)
@@ -33,28 +33,6 @@ app.get('/getrate', (req, res) => {
         `http://api.fixer.io/latest?symbols=${input},${output}`,
         function (err, response, body) {
             res.send(JSON.parse(body)["rates"])
-        }
-    )
-})
-
-app.get('/get')
-
-app.get('/handle', (req, res) => {
-
-    // const baseBittrex = "https://bittrex.com/api/v1.1/"
-    request.get(
-        `https://bittrex.com/api/v1.1/public/getcurrencies`,
-        function(error, response, body) {
-            if(!error && response.statusCode === 200) {
-                fx.rates = response["body"].rates
-                // const rate = fx(1).from(req["inputCurrency"]).to(req["outputCurrency"])
-                res.send({
-                    inputCurrency: req["inputCurrency"],
-                    outputCurrency: req["outputCurrency"],
-                    response: response.body.result,
-                    body: body
-                });
-            }
         }
     )
 })
