@@ -28,13 +28,24 @@ app.get('/getrate', (req, res) => {
     const output = req.query.outputCurrency
 
     if(!input) res.send(null)
-    const url = output ? `http://api.fixer.io/latest?symbols=${input},${output}` : `http://api.fixer.io/latest?base=${input}`
-    request.get(
-        `http://api.fixer.io/latest?symbols=${input},${output}`,
-        function (err, response, body) {
-            res.send(JSON.parse(body)["rates"])
-        }
-    )
+    if(output) {
+        request.get(
+            `http://api.fixer.io/latest?symbols=${input},${output}`,
+            function (err, response, body) {
+                const rates = JSON.parse(body)["rates"]
+                res.send({
+                    rate: rates[output] / rates[input]
+                })
+            }
+        )
+    } else {
+        request.get(
+            `http://api.fixer.io/latest?base=${input}`,
+            function (err, response, body) {
+                res.send(JSON.parse(body)["rates"])
+            }
+        )
+    }
 })
 
 app.listen(app.get("port"), () => {
