@@ -10,24 +10,44 @@ app.set("port", process.env.PORT || 3001);
 if (process.env.NODE_ENV === "production") {
     app.use(express.static("client/build"))
 }
-app.get('/', (req, res) => {
-    res.send("HELLO");
+
+//Returns list of currencies
+app.get('/getcurrencies', (req, res) => {
+    request.get(
+        'http://api.fixer.io/latest',
+        function(err, response, body) {
+            res.send(Object.keys(JSON.parse(body)["rates"]))
+        }
+    )
 })
 
-app.get('handle', (req, res) => {
+//Returns rates for currency
+//@param inputCurrency
+app.get('/getrate', (req, res) => {
+    request.get(
+        `http://api.fixer.io/latest?base=${req.inputCurrency}`,
+        function(err, response, body) {
+            res.send(JSON.parse(body)["rates"])
+        }
+    )
+})
+
+
+app.get('/handle', (req, res) => {
 
     // const baseBittrex = "https://bittrex.com/api/v1.1/"
     request.get(
-        "https://api.fixer.io/latest",
+        `https://bittrex.com/api/v1.1/public/getcurrencies`,
         function(error, response, body) {
             if(!error && response.statusCode === 200) {
-                fx.rates = response.rates
-                const rate = fx(1).from(req["inputCurrency"]).to(req["outputCurrency"])
-                res = {
+                fx.rates = response["body"].rates
+                // const rate = fx(1).from(req["inputCurrency"]).to(req["outputCurrency"])
+                res.send({
                     inputCurrency: req["inputCurrency"],
                     outputCurrency: req["outputCurrency"],
-                    rate: rate
-                };
+                    response: response.body.result,
+                    body: body
+                });
             }
         }
     )
