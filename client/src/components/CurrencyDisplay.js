@@ -1,33 +1,23 @@
 import React from 'react';
+import '../stylesheets/css/CurrencyDisplay.css'
+import {CurrencyRateHelper} from './CurrencyRateHelper'
 
 export class CurrencyDisplay extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      inputCurrency: 'USD',
-      outputCurrency: 'BTN',
-      currency: 0
-    };
-    this.setInputCurrency = this.setInputCurrency.bind(this);
-    this.setOutputCurrency = this.setOutputCurrency.bind(this);
-    this.setCurrency = this.setCurrency.bind(this);
-  }
-
-  setInputCurrency(val) {
-    this.setState({inputCurrency: val});
-  }
-
-  setOutputCurrency(val) {
-    this.setState({outputCurrency: val});
-  }
-
-  setCurrency(val) {
-    this.setState({currency: val});
-  }
-
   render() {
-    return (
-      <div className = "CurrencyDisplay"></div>
-    );
+      if(this.props.inputCurrency.length != 0 && this.props.outputCurrency.length != 0){
+        return (
+          <div className="CurrencyDisplay">
+            <h2>{this.props.inputCurrency} to {this.props.outputCurrency}:</h2>
+            <h1>{this.props.rate}</h1>
+        </div>
+        );
+      }
+      else{
+        return (
+          <div className="CurrencyDisplay">
+            <h1>Choose some currency to exchange</h1>
+          </div>
+        );
+      }
   }
 }
