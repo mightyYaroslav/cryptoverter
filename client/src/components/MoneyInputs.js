@@ -2,8 +2,9 @@ import React from 'react';
 import {CurrencySelectField} from './CurrencySelectField';
 import {MoneyCountField} from './MoneyCountField';
 import {CurrencyDisplay} from './CurrencyDisplay';
-import {Button, Grid, Row, Col} from 'react-bootstrap';
+import {Grid, Row, Col} from 'react-bootstrap';
 import {CurrencyRateHelper} from './CurrencyRateHelper';
+import '../stylesheets/css/MoneyInputs.css'
 
 const inputMoney = ['USD', 'UAH'];
 const outputMoney = ['BITCOIN', 'EFIR'];
@@ -57,7 +58,8 @@ export class MoneyInputs extends React.Component {
 
   render() {
     return (
-      <form>
+      <div className = 'container'>
+        <form>
         <Grid>
           <Row>
             <Col md={6}>
@@ -71,7 +73,8 @@ export class MoneyInputs extends React.Component {
           </Row>
           <CurrencyDisplay inputCurrency = {this.state.inputCurrency} outputCurrency = {this.state.outputCurrency} rate = {this.state.currencyRate}/>
         </Grid>
-      </form>
+        </form>
+      </div>
     );
   }
 }
