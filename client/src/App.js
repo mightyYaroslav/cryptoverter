@@ -1,21 +1,42 @@
-import React, { Component } from 'react';
-import logo from './logo.svg';
+import React, {
+  Component
+} from 'react';
 import './App.css';
+import { Button, FormControl, Grid, Row, Col } from 'react-bootstrap';
 
-class App extends Component {
+const inputMoney = ['USD'];
+const outputMoney = ['BITCOIN'];
+
+const formInstance = (
+    <div className = "container">
+      <form>
+        <Grid>
+          <Row>
+            <Col md = {6}>
+            <FormControl componentClass="select" placeholder="select">
+              <option value="select">Input money</option>
+              {inputMoney.map((money) => {
+                return (<option value = 'other'>{money}</option>);
+              })}
+            </FormControl>
+            </Col>
+            <Col md = {6}>
+            <FormControl componentClass="select" placeholder="select">
+              <option value="select">Output money</option>
+              {outputMoney.map((money) => {
+                return (<option value = 'other'>{money}</option>);
+              })}
+            </FormControl>
+            </Col>
+            </Row>
+        </Grid>
+        <Button type = "submit"> Submit </Button>
+      </form>
+    </div>
+);
+
+export class App extends Component {
   render() {
-    return (
-      <div className="App">
-        <div className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <h2>Welcome to Reacto</h2>
-        </div>
-        <p className="App-intro">
-          To get started, edit <code>src/App.js</code> and save to reload.
-        </p>
-      </div>
-    );
+    return formInstance;
   }
 }
-
-export default App;
