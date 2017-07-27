@@ -7,3 +7,7 @@ body {
 .container{
   text-align: center;
 }
+
+.input{
+  margin-top: 20px;
+}
