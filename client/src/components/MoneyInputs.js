@@ -6,20 +6,22 @@ import {Grid, Row, Col} from 'react-bootstrap';
 import {CurrencyRateHelper} from './CurrencyRateHelper';
 import '../stylesheets/css/MoneyInputs.css'
 
-const inputMoney = ['USD', 'UAH'];
-const outputMoney = ['BITCOIN', 'EFIR'];
+const inputMoney = ['USD','BRL'];
+const outputMoney = ['GBP', 'RUB'];
 
 export class MoneyInputs extends React.Component {
   constructor(props){
     super(props);
+    this.setCurrencyRate = this.setCurrencyRate.bind(this);
+    CurrencyRateHelper.getRate(inputMoney[0],outputMoney[0],this.setCurrencyRate);
     this.state = {
       inputCountDisabled : false,
       outputCountDisabled : false,
       inputCountValue : '',
       outputCountValue: '',
-      inputCurrency: '',
-      outputCurrency: '',
-      currencyRate: 0
+      inputCurrency: inputMoney[0],
+      outputCurrency: outputMoney[0],
+      currencyRate: 'loading..'
     };
     this.onMoneyCountChanged = this.onMoneyCountChanged.bind(this);
     this.setInputCurrency = this.setInputCurrency.bind(this);
@@ -27,24 +29,29 @@ export class MoneyInputs extends React.Component {
     this.updateCurrencyRate = this.updateCurrencyRate.bind(this);
   }
 
-  updateCurrencyRate(){
-    let inputCurrency = this.state.inputCurrency;
-    let outputCurrency = this.state.outputCurrency;
-    this.setState({currencyRate : CurrencyRateHelper.getRate(inputCurrency, outputCurrency)});
+  updateCurrencyRate(inputCurrency, outputCurrency){
+    if(inputCurrency !== '' && outputCurrency !== ''){
+        this.setCurrencyRate('loading..');
+        this.setState({currencyRate : CurrencyRateHelper.getRate(inputCurrency, outputCurrency,this.setCurrencyRate)});
+    }
+  }
+
+  setCurrencyRate(val){
+    this.setState({currencyRate: val});
   }
 
   setInputCurrency(val){
     this.setState({inputCurrency: val});
-    this.updateCurrencyRate();
+    this.updateCurrencyRate(val,this.state.outputCurrency);
   }
 
   setOutputCurrency(val){
     this.setState({outputCurrency: val});
-    this.updateCurrencyRate();
+    this.updateCurrencyRate(this.state.inputCurrency,val);
   }
 
   onMoneyCountChanged(val, inputType){
-    let isEmpty = val != '';
+    let isEmpty = val !== '';
     if(inputType === 'input'){
       this.setState({outputCountDisabled : isEmpty});
       this.setState({inputCountValue : val});

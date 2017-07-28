@@ -36,6 +36,7 @@ app.get('/getrate', (req, res) => {
                 res.send({
                     rate: rates[output] / rates[input]
                 })
+                console.log('HELLO from rates');
             }
         )
     } else {

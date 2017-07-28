@@ -15,15 +15,13 @@ export class CurrencySelectField extends React.Component{
     this.onChange = this.onChange.bind(this);
   }
   onChange(e){
-    let value = e.target.value;
-    this.props.onChange(value);
+    this.props.onChange(e.target.value);
   }
   render(){
     return (
       <div>
         <ControlLabel>{this.props.labelString}</ControlLabel>
-        <FormControl onChange = {this.onChange} componentClass="select" placeholder="select">
-          <option value={''}></option>
+        <FormControl componentClass="select" onChange = {this.onChange}>
           {this.props.currencyList.map((money) => {
             return (
               <option value={money}>{money}</option>
