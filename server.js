@@ -1,5 +1,6 @@
 const express = require("express");
 const request = require("request");
+// require('request').debug = true
 const fx = require("money");
 const app = express();
 
@@ -10,6 +11,31 @@ if (process.env.NODE_ENV === "production") {
     app.use(express.static("client/build"))
 }
 
+app.get('/temp', (req, res) => {
+    request.get(
+        {
+            url: 'https://www.cryptonator.com/api/currencies'
+        },
+
+        function (err, response, body) {
+            console.log(err)
+            console.log(response)
+            console.log(body)
+            currencies.concat(JSON.parse(body).rows.map((o) => o.code))
+            res.send(JSON.stringify(currencies.forEach((t, i) => {
+                    let obj = {
+                        key: "c" + i,
+                        value: "c" + i,
+                        text: t
+                    }
+                    console.log(obj);
+                    return obj
+                }
+            )))
+        }
+    )
+})
+
 //Returns list of currencies
 app.get('/getcurrencies', (req, res) => {
     request.get(
@@ -19,7 +45,10 @@ app.get('/getcurrencies', (req, res) => {
             request.get(
                 'https://www.cryptonator.com/api/currencies',
                 function (err, response, body) {
-                    currencies.concat(JSON.parse(body).rows.map((o) => o.code))
+                    console.log(err)
+                    console.log(response)
+                    console.log(body)
+                    currencies.concat(JSON.parse(body2).rows.map((o) => o.code))
                     res.send(currencies.forEach((t, i) => {
                             let obj = {
                                 key: "c" + i,
@@ -37,8 +66,10 @@ app.get('/getcurrencies', (req, res) => {
 })
 
 //Returns rates for conversion
-//Type - f2f: conversion between two fiat currencies
-//     - f2c: conversion between any fiat currency to crypto
+//Parameters:
+//@type
+// - f2f: conversion between two fiat currencies
+// - f2c: conversion between any fiat currency to crypto
 app.get('/getrate', (req, res) => {
     const type = req.query.type
     const input = req.query.inputCurrency
@@ -58,7 +89,9 @@ app.get('/getrate', (req, res) => {
         request.get(
             `https://api.cryptonator.com/api/full/usd-${output.toLowerCase()}`,
             function (err, response, body) {
-                res.send(rateToUsd * JSON.parse(body).price)
+                res.send({
+                    rate: rateToUsd * JSON.parse(body).ticker.price
+                })
             }
         )
     }
@@ -66,31 +99,22 @@ app.get('/getrate', (req, res) => {
     if (!input) res.send(null)
     if (output) {
         if (type === "f2c") {
-            if (input.toLowerCase() === "usd") {
+            if (input.toLowerCase() === "usd")
                 fiatToCrypto(res, 1)
-            } else {
-                fiatToFiat(input, "USD", fiatToCrypto(res, rate))
-            }
+            else
+                fiatToFiat(input, "USD", fiatToCrypto)
         } else {
             request.get(
                 `http://api.fixer.io/latest?symbols=${input},${output}`,
                 function (err, response, body) {
                     const rates = JSON.parse(body)["rates"]
-                    res.send({
+                    res.send(({
                         rate: rates[output] / rates[input]
-                    })
+                    }))
                 }
             )
         }
     }
-    /*else {
-           request.get(
-               `http://api.fixer.io/latest?base=${input}`,
-               function (err, response, body) {
-                   res.send(JSON.parse(body)["rates"])
-               }
-           )
-       }*/
 })
 
 app.listen(app.get("port"), () => {
