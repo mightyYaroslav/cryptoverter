@@ -2,6 +2,7 @@ const express = require("express");
 const request = require("request");
 // require('request').debug = true
 const fx = require("money");
+const converter = require("./converter.js");
 const app = express();
 
 app.set("port", process.env.PORT || 3001);
@@ -72,55 +73,12 @@ app.get('/getcurrencies', (req, res) => {
 // - f2c: conversion between any fiat currency to crypto
 // - c2f: conevrsion from crypto currency to fiat
 app.get('/getrate', (req, res) => {
-    const mediator = "usd"
-    const modes = {
-        f2f: "f2f",
-        f2c: "f2c",
-        c2f: "c2f"
-    }
-
-
     const type = req.query.type
-    const input = req.query.inputCurrency.toLowerCase()
-    const output = req.query.outputCurrency.toLowerCase()
-
-    function fiatToFiat(input, output, callback) {
-        request.get(
-            `http://api.fixer.io/latest?symbols=${input.toUpperCase()},${output.toUpperCase()}`,
-            function (err, response, body) {
-                const rates = JSON.parse(body)["rates"]
-                callback(res, rates[output] / rates[input])
-            }
-        )
-    }
-
-    function fiatToCrypto(res, rateToUsd) {
-        request.get(
-            `https://api.cryptonator.com/api/full/usd-${output.toLowerCase()}`,
-            function (err, response, body) {
-                res.send({
-                    rate: rateToUsd * JSON.parse(body).ticker.price
-                })
-            }
-        )
-    }
+    const input = req.query.inputCurrency
+    const output = req.query.outputCurrency
 
     if (!input || !output) res.send(null)
-    switch(type) {
-    case modes.f2c:
-        if (input.toLowerCase() === "usd")
-            fiatToCrypto(res, 1)
-        else
-            fiatToFiat(input, "USD", fiatToCrypto)
-        break
-    case modes.c2f:
-        fiatToFiat(output, "USD", fiatToCrypto)
-        break
-    default:
-        fiatToFiat(input, output, (res, rate) => res.send({
-            rate: rate
-        }))
-    }
+    converter.convert[type](res, input, output)
 })
 
 app.listen(app.get("port"), () => {
