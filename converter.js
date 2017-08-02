@@ -18,7 +18,7 @@ function fiatToCrypto(res, rateToUsd, cryptoOutput, direct = true) {
     request.get(
         `https://api.cryptonator.com/api/full/${mediatorCurrency.toLowerCase()}-${cryptoOutput.toLowerCase()}`,
         function (err, response, body) {
-            const rate = rateToUsd * JSON.parse(body).ticker.price
+            const rate = JSON.parse(body).ticker.price / rateToUsd
             res.send({ rate: direct ? rate : 1 / rate })
         }
     )
