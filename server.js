@@ -48,7 +48,7 @@ app.get('/getcurrencies', (req, res) => {
                     console.log(err)
                     console.log(response)
                     console.log(body)
-                    currencies.concat(JSON.parse(body2).rows.map((o) => o.code))
+                    currencies.concat(JSON.parse(body).rows.map((o) => o.code))
                     res.send(currencies.forEach((t, i) => {
                             let obj = {
                                 key: "c" + i,
@@ -70,14 +70,23 @@ app.get('/getcurrencies', (req, res) => {
 //@type
 // - f2f: conversion between two fiat currencies
 // - f2c: conversion between any fiat currency to crypto
+// - c2f: conevrsion from crypto currency to fiat
 app.get('/getrate', (req, res) => {
+    const mediator = "usd"
+    const modes = {
+        f2f: "f2f",
+        f2c: "f2c",
+        c2f: "c2f"
+    }
+
+
     const type = req.query.type
-    const input = req.query.inputCurrency
-    const output = req.query.outputCurrency
+    const input = req.query.inputCurrency.toLowerCase()
+    const output = req.query.outputCurrency.toLowerCase()
 
     function fiatToFiat(input, output, callback) {
         request.get(
-            `http://api.fixer.io/latest?symbols=${input},${output}`,
+            `http://api.fixer.io/latest?symbols=${input.toUpperCase()},${output.toUpperCase()}`,
             function (err, response, body) {
                 const rates = JSON.parse(body)["rates"]
                 callback(res, rates[output] / rates[input])
@@ -96,24 +105,21 @@ app.get('/getrate', (req, res) => {
         )
     }
 
-    if (!input) res.send(null)
-    if (output) {
-        if (type === "f2c") {
-            if (input.toLowerCase() === "usd")
-                fiatToCrypto(res, 1)
-            else
-                fiatToFiat(input, "USD", fiatToCrypto)
-        } else {
-            request.get(
-                `http://api.fixer.io/latest?symbols=${input},${output}`,
-                function (err, response, body) {
-                    const rates = JSON.parse(body)["rates"]
-                    res.send(({
-                        rate: rates[output] / rates[input]
-                    }))
-                }
-            )
-        }
+    if (!input || !output) res.send(null)
+    switch(type) {
+    case modes.f2c:
+        if (input.toLowerCase() === "usd")
+            fiatToCrypto(res, 1)
+        else
+            fiatToFiat(input, "USD", fiatToCrypto)
+        break
+    case modes.c2f:
+        fiatToFiat(output, "USD", fiatToCrypto)
+        break
+    default:
+        fiatToFiat(input, output, (res, rate) => res.send({
+            rate: rate
+        }))
     }
 })
 
