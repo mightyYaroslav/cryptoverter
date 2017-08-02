@@ -1,5 +1,4 @@
 const request = require("request")
-require('request').debug = true
 const mediatorCurrency = "usd"
 
 function fiatToFiat(res, input, output, callback) {
