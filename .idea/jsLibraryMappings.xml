@@ -1,9 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="JavaScriptLibraryMappings">
-    <file url="file://$PROJECT_DIR$" libraries="{cryptoverter/node_modules}" />
-    <file url="file://$PROJECT_DIR$/client" libraries="{cryptoverter/client/node_modules}" />
-    <file url="PROJECT" libraries="{cryptoverter/client/node_modules, cryptoverter/node_modules, react-0.14.6, react-dom-0.14.6}" />
     <includedPredefinedLibrary name="Node.js Core" />
   </component>
 </project>
