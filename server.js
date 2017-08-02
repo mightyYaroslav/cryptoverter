@@ -1,6 +1,5 @@
 const express = require("express");
 const request = require("request");
-// require('request').debug = true
 const fx = require("money");
 const converter = require("./converter.js");
 const app = express();
@@ -73,7 +72,7 @@ app.get('/getcurrencies', (req, res) => {
 // - f2c: conversion between any fiat currency to crypto
 // - c2f: conevrsion from crypto currency to fiat
 app.get('/getrate', (req, res) => {
-    const type = req.query.type
+    const type = req.query.type || "f2f"
     const input = req.query.inputCurrency
     const output = req.query.outputCurrency
 

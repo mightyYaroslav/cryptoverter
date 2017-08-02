@@ -1,48 +1,47 @@
 const request = require("request")
+require('request').debug = true
 const mediatorCurrency = "usd"
 
 function fiatToFiat(res, input, output, callback) {
+    input = input.toUpperCase();
+    output = output.toUpperCase();
     request.get(
-        `http://api.fixer.io/latest?symbols=${input.toUpperCase()},${output.toUpperCase()}`,
+        `http://api.fixer.io/latest?symbols=${input},${output}`,
         function (err, response, body) {
             const rates = JSON.parse(body)["rates"]
-            callback(res, rates[output] / rates[input], output)
+            callback(res, rates[output] / rates[input])
         }
     )
 }
 
-function fiatToCrypto(res, rateToUsd, output, direct = true) {
+function fiatToCrypto(res, rateToUsd, cryptoOutput, direct = true) {
     request.get(
-        `https://api.cryptonator.com/api/full/${mediatorCurrency.toLowerCase()}-${output.toLowerCase()}`,
+        `https://api.cryptonator.com/api/full/${mediatorCurrency.toLowerCase()}-${cryptoOutput.toLowerCase()}`,
         function (err, response, body) {
             const rate = rateToUsd * JSON.parse(body).ticker.price
-            res.send({
-                rate: direct ? rate : 1 / rate
-            })
+            res.send({ rate: direct ? rate : 1 / rate })
         }
     )
 }
 
-function cryptoToFiat(res, rateToUsd, output) {
-    return fiatToCrypto(res, rateToUsd, output, false)
+function cryptoToFiat(res, rateToUsd, cryptoOutput) {
+    return fiatToCrypto(res, rateToUsd, cryptoOutput, false)
 }
 
 exports.convert = {
     f2f: function(res, input, output) {
-        fiatToFiat(res, input, output, (res, rate) => res.send({
-            rate: rate
-        }))
+        fiatToFiat(res, input, output, (res, rate) => res.send({ rate: rate }))
     },
     f2c: function(res, input, output) {
         if (input.toLowerCase() === mediatorCurrency)
             fiatToCrypto(res, 1, output)
         else
-            fiatToFiat(res, input, mediatorCurrency, fiatToCrypto)
+            fiatToFiat(res, input, mediatorCurrency, (res, rate) => fiatToCrypto(res, rate, output))
     },
     c2f: function(res, input, output) {
         if (output.toLowerCase() === mediatorCurrency)
-            cryptoToFiat(res, 1, output)
+            cryptoToFiat(res, 1, input)
         else
-            fiatToFiat(res, output, mediatorCurrency, cryptoToFiat)
+            fiatToFiat(res, output, mediatorCurrency, (res, rate) => cryptoToFiat(res, rate, input))
     }
 }
